@@ -35,8 +35,10 @@ module alu #(parameter WIDTH = 8) (
     output logic            f_parity,   // Parity flag
 );
 
-    // Output wires for adder operations and bitwise operations
+    // Wires for adder operations and bitwise operations
     logic[WIDTH:0] adder_out; // Note extra width for carry bit
+    logic[WIDTH-1:0] adder_in_A, adder_in_B;
+    logic adder_in_C;
     logic[WIDTH-1:0] bitop_out;
     logic bitop_c_out;
     // Determines whether ALU uses output from adder or bitwise ops
@@ -45,16 +47,29 @@ module alu #(parameter WIDTH = 8) (
         || (op == INCREMENT) || (op == DECREMENT);
 
     always_comb begin : output_logic
-        // Default value for adder operation output
-        adder_out = 0;
+        // Default value for adder operations
+        adder_out = adder_in_A + adder_in_B + adder_in_C;
+        adder_in_A = in_A;
+        adder_in_B = in_B;
+        adder_in_C = c_in;
         case (op) // Set adder_out based on arithmetic operations
-            ADD             : adder_out = in_A + in_B;
-            ADD_WITH_CIN    : adder_out = in_A + in_B + c_in;
-            SUBTRACT        : adder_out = in_A + ~in_B + 1;
-            SUB_WITH_CIN    : adder_out = in_A + ~in_B + c_in;
-            TWOS_COMPLEMENT : adder_out = ~in_A + 1;
-            INCREMENT       : adder_out = in_A + 1;
-            DECREMENT       : adder_out = in_A - 1;
+            ADD             : adder_in_C = 0; // in_A + in_B
+            // ADD_WITH_CIN    : ; // in_A + in_B + c_in
+            SUBTRACT        : begin
+                adder_in_B = ~in_B; adder_in_C = 1; // in_A + ~in_B + 1
+            end
+            SUB_WITH_CIN    : begin
+                adder_in_B = ~in_B; = // in_A + ~in_B + c_in
+            end
+            TWOS_COMPLEMENT : begin
+                adder_in_A = ~in_A; adder_in_B = 0; adder_in_C = 1; // ~in_A + 1
+            end
+            INCREMENT       : begin
+                adder_in_B = 0; adder_in_C = 1; // in_A + 1
+            end
+            DECREMENT       : begin
+                adder_in_B = -1; adder_in_C = 0; // in_A - 1
+            end
         endcase
 
         // Default values for bitwise operation output and carry out
@@ -88,31 +103,10 @@ module alu #(parameter WIDTH = 8) (
     end
 
     always_comb begin : flag_logic
-        zero = (out == 0);
-        negative = (out[WIDTH-1] == 1);
-        overflow = 0;
-        if (
-            (
-                // Case 1: MSB changes when adding two numbers with the same sign.
-                in_A[WIDTH] == in_B[WIDTH] // Same sign
-                && out[WIDTH] != in_A[WIDTH] // MSB changes
-                && ( // Opcode was an add
-                    op == ADD
-                    || op == ADD_WITH_CIN
-                )
-            )
-            || (
-                // Case 2: MSB changes when subtracting two numbers with different signs.
-                in_A[WIDTH] != in_B[WIDTH] // Different signs
-                && out[WIDTH] != in_A[WIDTH] // MSB changes
-                && ( // Opcode was a sub
-                    op == SUBTRACT
-                    || op == SUB_WITH_CIN
-                )
-            )
-        ) begin
-            overflow = 1;
-        end
+        zero = out == 0;
+        negative = out[WIDTH-1] == 1;
+        overflow = (adder_in_A[WIDTH-1] == adder_in_B[WIDTH - 1]) 
+            && (adder_in_A[WIDTH-1] != adder_out[WIDTH - 1]);
         parity = ^out; // XOR reduction operator
     end
 

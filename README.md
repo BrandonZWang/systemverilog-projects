@@ -1,6 +1,6 @@
 # SystemVerilog Projects
 
-A showcase of some projects in SystemVerilog. All content in this repo was created without the use of generative AI.
+A showcase of some projects in SystemVerilog. All code in this repo was written without the use of generative AI.
 
 ## License
 

@@ -54,14 +54,15 @@ class alu_scoreboard;
 endclass
 
 module tb_alu;
+    int ALU_WIDTH = 8; // bit width of DUT
+
     int num_correct; // number of correct transactions so far
     int num_total; // number of total transactions so far
-    int alu_width = 8; // bit width of DUT
     int verbose = 0; // Whether to print verbose logs
     int wait_time = 5; // wait time in ns between transactions
     int num_transactions = 20; // total number of transactions
 
-    alu #() dut_alu (
+    alu #(WIDTH = ALU_WIDTH) dut_alu (
         .in_A, .in_B, .c_in, .op,
 
         .out, .c_out, .f_zero, .f_negative, .f_overflow, .f_parity
@@ -74,9 +75,6 @@ module tb_alu;
         if($test$plusargs("verbose")) begin
             $display("Verbose logging enabled", alu_width);
             verbose = 1;
-        end
-        if ($value$plusargs("alu_width=%d", alu_width)) begin
-            $display("Using custom alu_width = %0d", alu_width);
         end
         if ($value$plusargs("wait_time=%d", wait_time)) begin
             $display("Using custom wait_time = %0d", wait_time);

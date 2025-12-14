@@ -101,7 +101,7 @@ module tb_alu;
 
             int in_A = signed'(transaction.in_A);
             int in_B = signed'(transaction.in_B);
-            bit c_in = (bit)transaction.c_in;
+            bit c_in = bit'(transaction.c_in);
             opcode op = transaction.op;
 
             expected_c_out = 0;

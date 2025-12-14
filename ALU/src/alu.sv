@@ -68,10 +68,10 @@ module alu #(parameter WIDTH = 8) (
             BIT_OR          : result = {1'b0, in_A | in_B};
             BIT_XOR         : result = {1'b0, in_A ^ in_B};
             BIT_NOT         : result = {1'b0, ~in_A};
-            ASR             : result = {in_A[0], in_A >>> 1};
-            LSR             : result = {in_A[0], in_A >> 1};
-            SHIFT_LEFT      : result = in_A_zeroext << 1;
-            ROTATE_LEFT     : result = {1'b0, in_A[WIDTH-2:0], in_A[0]};
+            ASR             : result = {in_A_signext[0], in_A_signext[WIDTH:1]}; // fill sign
+            LSR             : result = {in_A_zeroext[0], in_A_zeroext[WIDTH:1]}; // fill zero
+            SHIFT_LEFT      : result = {in_A, 1'b0}; // pad zero on end
+            ROTATE_LEFT     : result = {1'b0, in_A[WIDTH-2:0], in_A[WIDTH-1]};
         endcase
 
         out = result[WIDTH-1:0];

@@ -105,25 +105,23 @@ module tb_alu;
             opcode op = transaction.op;
 
             expected_c_out = 0;
+            int result;
             case (op) // set outputs based on bitwise operations
-                PASSTHROUGH     : expected_out = in_A;
-                ADD             : begin
-                    expected_out = (in_A + in_B) % (2**WIDTH);
-                    expected_c_out = (in_A + in_B) >>
-                end
-                ADD_WITH_CIN    : expected_out = (in_A + in_B + tx.c_in) % (2**WIDTH);
-                SUBTRACT        : expected_out = (in_A - in_B) % (2**WIDTH)
-                SUB_WITH_CIN    : expected_out = (in_A - in_B - ~c_in) % (2**WIDTH)
-                TWOS_COMPLEMENT : expected_out = -1 * tx.in_A;
-                INCREMENT       : expected_out = in_A + 1;
-                DECREMENT       : result = in_A_signext - 1;
-                BIT_AND         : result = {1'b0, in_A & in_B};
-                BIT_OR          : result = {1'b0, in_A | in_B};
-                BIT_XOR         : result = {1'b0, in_A ^ in_B};
-                BIT_NOT         : result = {1'b0, ~in_A};
-                ASR             : result = {in_A[0], in_A >>> 1};
-                LSR             : result = {in_A[0], in_A >> 1};
-                SHIFT_LEFT      : result = in_A_zeroext << 1;
+                PASSTHROUGH     : result = in_A;
+                ADD             : result = in_A + in_B;
+                ADD_WITH_CIN    : result = in_A + in_B + c_in;
+                SUBTRACT        : result = in_A - in_B;
+                SUB_WITH_CIN    : result = in_A - in_B - ~c_in;
+                TWOS_COMPLEMENT : result = -1 * tx.in_A;
+                INCREMENT       : result = in_A + 1;
+                DECREMENT       : result = in_A - 1;
+                BIT_AND         : result = in_A & in_B;
+                BIT_OR          : result = in_A | in_B;
+                BIT_XOR         : result = in_A ^ in_B;
+                BIT_NOT         : result = ~in_A;
+                ASR             : result = in_A >>> 1};
+                LSR             : result = in_A >> 1;
+                SHIFT_LEFT      : result = in_A << 1;
                 ROTATE_LEFT     : result = {1'b0, in_A[WIDTH-2:0], in_A[0]};
             endcase
 

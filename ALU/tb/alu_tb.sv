@@ -99,15 +99,18 @@ module tb_alu;
             bit expected_c_out, expected_f_zero, expected_f_negative;
             bit expected_f_overflow, expected_f_parity;
 
-            int in_A = (int)transaction.in_A;
-            int in_B = (int)transaction.in_B;
+            int in_A = signed'(transaction.in_A);
+            int in_B = signed'(transaction.in_B);
             bit c_in = (bit)transaction.c_in;
             opcode op = transaction.op;
 
             expected_c_out = 0;
             case (op) // set outputs based on bitwise operations
                 PASSTHROUGH     : expected_out = in_A;
-                ADD             : expected_out = (in_A + in_B) % (2**WIDTH);
+                ADD             : begin
+                    expected_out = (in_A + in_B) % (2**WIDTH);
+                    expected_c_out = (in_A + in_B) >>
+                end
                 ADD_WITH_CIN    : expected_out = (in_A + in_B + tx.c_in) % (2**WIDTH);
                 SUBTRACT        : expected_out = (in_A - in_B) % (2**WIDTH)
                 SUB_WITH_CIN    : expected_out = (in_A - in_B - ~c_in) % (2**WIDTH)

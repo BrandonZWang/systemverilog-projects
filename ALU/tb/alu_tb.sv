@@ -141,11 +141,13 @@ module tb_alu;
                 default         : expected_c_out = 0;
             endcase
 
+            // Flag calculation
             expected_f_zero = (expected_out == 0);
             expected_f_negative = (expected_out < 0);
+            // A and B have same sign + A and out have different signs
             expected_f_overflow = ((in_A * in_B) > 0) && ((in_A * expected_out) < 0);
 
-            // Drive inputs to interface
+            // Drive inputs to DUT
             dut_alu.in_A = transaction.in_A;
             dut_alu.in_B = transaction.in_B;
             dut_alu.c_in = transaction.c_in;
@@ -153,6 +155,7 @@ module tb_alu;
 
             if (verbose) $display("T=%0t Sent transaction %s", $time, tx.to_string());
 
+            // Capture outputs from DUT
             transaction.out = dut_alu.out;
             transaction.c_out = dut_alu.c_out;
             transaction.f_zero = dut_alu.f_zero;

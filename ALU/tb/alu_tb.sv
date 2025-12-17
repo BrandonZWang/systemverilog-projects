@@ -104,7 +104,6 @@ module tb_alu;
             bit c_in = bit'(transaction.c_in);
             opcode op = transaction.op;
 
-            expected_c_out = 0;
             // set expected_out based on op
             int result;
             case (op)
@@ -123,7 +122,23 @@ module tb_alu;
                 ASR             : result = in_A >>> 1;
                 LSR             : result = in_A >> 1;
                 SHIFT_LEFT      : result = in_A << 1;
-                ROTATE_LEFT     : result = in_A >> 1 + (in_A % 2) << (WIDTH - 1);
+                ROTATE_LEFT     : result = in_A >> 1 + (in_A % 2) << (ALU_WIDTH-1);
+            endcase
+            expected_c_out = (ALU_WIDTH)'(result);
+
+            // set expected c_out based on op
+            case (op)
+                ADD             : expected_c_out = (in_A + in_B) >> ALU_WIDTH;
+                ADD_WITH_CIN    : expected_c_out = (in_A + in_B + c_in) >> ALU_WIDTH;
+                SUBTRACT        : result = in_A - in_B;
+                SUB_WITH_CIN    : result = in_A - in_B - ~c_in;
+                TWOS_COMPLEMENT : result = -1 * tx.in_A;
+                INCREMENT       : result = in_A + 1;
+                DECREMENT       : result = in_A - 1;
+                ASR             : expected_c_out = in_A[0];
+                LSR             : expected_c_out = in_A[0];
+                SHIFT_LEFT      : expected_c_out = in_A[ALU_WIDTH-1];
+                default         : expected_c_out = 0;
             endcase
 
             expected_f_zero = (expected_out == 0);
@@ -147,5 +162,7 @@ module tb_alu;
 
             #(wait_time);
         }
+
+        $display("T=%0t FINAL: %0d/%0d correct", $time, num_correct, num_total);
     end
 endmodule

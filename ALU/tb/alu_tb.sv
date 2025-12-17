@@ -76,10 +76,10 @@ module tb_alu;
             $display("Verbose logging enabled", alu_width);
             verbose = 1;
         end
-        if ($value$plusargs("wait_time=%d", wait_time)) begin
+        if ($value$plusargs("wait_time=%0d", wait_time)) begin
             $display("Using custom wait_time = %0d", wait_time);
         end
-        if ($value$plusargs("num_transactions=%d", num_transactions)) begin
+        if ($value$plusargs("num_transactions=%0d", num_transactions)) begin
             $display("Using custom num_transactions = %0d", num_transactions);
         end
         
@@ -124,17 +124,17 @@ module tb_alu;
                 SHIFT_LEFT      : result = in_A << 1;
                 ROTATE_LEFT     : result = in_A >> 1 + (in_A % 2) << (ALU_WIDTH-1);
             endcase
-            expected_c_out = (ALU_WIDTH)'(result);
+            expected_out = (ALU_WIDTH)'(result);
 
             // set expected c_out based on op
             case (op)
-                ADD             : expected_c_out = (in_A + in_B) >> ALU_WIDTH;
-                ADD_WITH_CIN    : expected_c_out = (in_A + in_B + c_in) >> ALU_WIDTH;
-                SUBTRACT        : result = in_A - in_B;
-                SUB_WITH_CIN    : result = in_A - in_B - ~c_in;
-                TWOS_COMPLEMENT : result = -1 * tx.in_A;
-                INCREMENT       : result = in_A + 1;
-                DECREMENT       : result = in_A - 1;
+                ADD             : expected_c_out = result >> ALU_WIDTH;
+                ADD_WITH_CIN    : expected_c_out = result >> ALU_WIDTH;
+                SUBTRACT        : expected_c_out = result >> ALU_WIDTH;
+                SUB_WITH_CIN    : expected_c_out = result >> ALU_WIDTH;
+                TWOS_COMPLEMENT : expected_c_out = result >> ALU_WIDTH;
+                INCREMENT       : expected_c_out = result >> ALU_WIDTH;
+                DECREMENT       : expected_c_out = result >> ALU_WIDTH;
                 ASR             : expected_c_out = in_A[0];
                 LSR             : expected_c_out = in_A[0];
                 SHIFT_LEFT      : expected_c_out = in_A[ALU_WIDTH-1];
@@ -142,8 +142,7 @@ module tb_alu;
             endcase
 
             expected_f_zero = (expected_out == 0);
-            expected_f_negative = (expected_out < 0);
-            expected_f_overflow = (expected_out == 0);
+            expected_f_negative = TODO;
 
             // Drive inputs to interface
             dut_alu.in_A = transaction.in_A;

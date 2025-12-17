@@ -105,8 +105,9 @@ module tb_alu;
             opcode op = transaction.op;
 
             expected_c_out = 0;
+            // set expected_out based on op
             int result;
-            case (op) // set outputs based on bitwise operations
+            case (op)
                 PASSTHROUGH     : result = in_A;
                 ADD             : result = in_A + in_B;
                 ADD_WITH_CIN    : result = in_A + in_B + c_in;
@@ -119,10 +120,10 @@ module tb_alu;
                 BIT_OR          : result = in_A | in_B;
                 BIT_XOR         : result = in_A ^ in_B;
                 BIT_NOT         : result = ~in_A;
-                ASR             : result = in_A >>> 1};
+                ASR             : result = in_A >>> 1;
                 LSR             : result = in_A >> 1;
                 SHIFT_LEFT      : result = in_A << 1;
-                ROTATE_LEFT     : result = {1'b0, in_A[WIDTH-2:0], in_A[0]};
+                ROTATE_LEFT     : result = in_A >> 1 + (in_A % 2) << (WIDTH - 1);
             endcase
 
             expected_f_zero = (expected_out == 0);

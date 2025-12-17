@@ -142,7 +142,8 @@ module tb_alu;
             endcase
 
             expected_f_zero = (expected_out == 0);
-            expected_f_negative = TODO;
+            expected_f_negative = (expected_out < 0);
+            expected_f_overflow = ((in_A * in_B) > 0) && ((in_A * expected_out) < 0);
 
             // Drive inputs to interface
             dut_alu.in_A = transaction.in_A;

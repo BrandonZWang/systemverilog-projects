@@ -138,8 +138,8 @@ module alu #(parameter WIDTH = 8) (
     always_comb begin : flag_logic
         f_zero = out == 0;
         f_negative = out[WIDTH-1] == 1;
-        f_overflow = (in_A[WIDTH-1] == in_B[WIDTH - 1]) 
-            && (in_A[WIDTH-1] != out[WIDTH - 1]);
+        f_overflow = (in_A[WIDTH-1] == in_B[WIDTH-1]) 
+            && (in_A[WIDTH-1] != out[WIDTH-1]);
         f_parity = ^out; // XOR reduction operator
     end
 

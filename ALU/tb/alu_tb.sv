@@ -25,7 +25,13 @@ class alu_transaction #(parameter int WIDTH = 8);
     function new(); endfunction
 
     function string to_string();
-        return $sformatf("A=%0d B=%0d c_in=%0d opcode=%4b");
+        return $sformatf("A=%0d B=%0d c_in=%1b opcode=%4b", in_A, in_B, c_in, opcode);
+    endfunction
+
+    function string result_to_string();
+        return $sformatf("A=%0d B=%0d c_in=%1b opcode=%4b out=%0d c_out=%1b 
+        f_zero=%1b f_negative=%1b f_overflow=%1b f_parity=%1b",
+        in_A, in_B, c_in, opcode, out, c_out, f_zero, f_negative, f_overflow, f_parity);
     endfunction
 endclass
 
@@ -162,6 +168,18 @@ module tb_alu;
             transaction.f_negative = dut_alu.f_negative;
             transaction.f_overflow = dut_alu.f_overflow;
             transaction.f_parity = dut_alu.f_parity;
+
+            if (transaction.out == expected_out && transaction.c_out == expected_c_out
+                && transaction.f_zero == expected_f_zero && transaction.f_negative == expected_f_negative
+                && transaction.f_overflow == expected_f_overflow && transaction.f_parity == expected_f_parity) begin
+                if (verbose) $display("T=%0t Passed %s", $time, tx.result_to_string());
+                num_correct += 1;
+            end
+            else begin
+                $display("T=%0t FAILED %s", $time, tx.result_to_string());
+            end
+
+            num_total += 1;
 
             #(wait_time);
         }

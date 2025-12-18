@@ -168,7 +168,9 @@ module tb_alu;
                 num_correct += 1;
             end
             else begin // Fail if they don't match
-                $display("T=%0t FAILED %s", $time, tx.result_to_string());
+                $display("T=%0t FAILED %s\n    EXPECTED out=%0d c_out=%1b f_zero=%1b f_negative=%1b 
+                    f_overflow=%1b f_parity=%1b", $time, tx.result_to_string(), expected_out, expected_c_out,
+                    expected_f_zero,expected_f_negative, expected_f_overflow, expected_f_parity);
             end
 
             num_total += 1; // Increment transaction counter

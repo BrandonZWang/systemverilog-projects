@@ -24,10 +24,12 @@ class alu_transaction #(parameter int WIDTH = 8);
 
     function new(); endfunction
 
-    function string to_string();
+    // inputs_to_string() formats the inputs to the DUT
+    function string inputs_to_string();
         return $sformatf("A=%0d B=%0d c_in=%1b opcode=%4b", in_A, in_B, c_in, opcode);
     endfunction
 
+    // result_to_string() formats the full transaction contents including inputs / outputs
     function string result_to_string();
         return $sformatf("A=%0d B=%0d c_in=%1b opcode=%4b out=%0d c_out=%1b 
         f_zero=%1b f_negative=%1b f_overflow=%1b f_parity=%1b",
@@ -36,38 +38,23 @@ class alu_transaction #(parameter int WIDTH = 8);
 endclass
 
 /*
-* Scoreboards check DUT outputs for correctness.
-* Upon receiving 
+* Comprehensive randomized testbench for the alu module.
+* Command-line arguments to change verbosity, transaction wait time, 
+* and number of transactions.
+* Uses the alu_transaction object to drive and capture stimuli.
+*
+* Parameterize the width of the ALU by changing ALU_WIDTH below.
 */
-class alu_scoreboard;
-    mailbox scoreboard_mailbox;
-    int num_correct;
-    int num_total;
-
-    task run();
-        $display("T=%0t [SCBD] Starting ...", $time);
-        num_total = 0;
-        num_correct = 0;
-
-        forever begin
-            // TODO
-        end
-    endtask
-
-    function print_final_result();
-        $display("T=%0t [SCBD] FINAL: %0d/%0d correct", $time, num_correct, num_total);
-    endfunction
-endclass
-
 module tb_alu;
-    int ALU_WIDTH = 8; // bit width of DUT
+    int ALU_WIDTH = 8; // Bit width of DUT
 
-    int num_correct; // number of correct transactions so far
-    int num_total; // number of total transactions so far
+    int num_correct; // Number of correct transactions so far
+    int num_total; // Number of total transactions so far
     int verbose = 0; // Whether to print verbose logs
-    int wait_time = 5; // wait time in ns between transactions
-    int num_transactions = 20; // total number of transactions
+    int wait_time = 5; // Wait time in ns between transactions
+    int num_transactions = 20; // Total number of transactions
 
+    // DUT with parameterized widths
     alu #(WIDTH = ALU_WIDTH) dut_alu (
         .in_A, .in_B, .c_in, .op,
 
@@ -78,6 +65,7 @@ module tb_alu;
         $dumpfile("tb_alu.vcd");
         $dumpvars(0, tb_alu);
 
+        // Test for command line arguments
         if($test$plusargs("verbose")) begin
             $display("Verbose logging enabled", alu_width);
             verbose = 1;
@@ -89,6 +77,7 @@ module tb_alu;
             $display("Using custom num_transactions = %0d", num_transactions);
         end
         
+        // Initialize transaction tracker
         num_correct = 0;
         num_total = 0;
     end
@@ -96,15 +85,18 @@ module tb_alu;
     initial begin
         $display("T=%0t Starting...", $time);
 
+        // Generate transactions in loop
         for (int i = 0; i < num_transactions; i++) {
             alu_transaction transaction = new; // Create new transaction
             transaction.randomize(); // Randomize stimuli
             if (verbose) $display("T=%0t Created transaction %0d/%0d", $time, i+1, num_transactions);
 
+            // Calculate expected outputs
             int expected_out;
             bit expected_c_out, expected_f_zero, expected_f_negative;
             bit expected_f_overflow, expected_f_parity;
 
+            // Cast transaction elements to appropriate types, just in case
             int in_A = signed'(transaction.in_A);
             int in_B = signed'(transaction.in_B);
             bit c_in = bit'(transaction.c_in);
@@ -141,7 +133,7 @@ module tb_alu;
                 TWOS_COMPLEMENT : expected_c_out = result >> ALU_WIDTH;
                 INCREMENT       : expected_c_out = result >> ALU_WIDTH;
                 DECREMENT       : expected_c_out = result >> ALU_WIDTH;
-                ASR             : expected_c_out = in_A[0];
+                ASR             : expected_c_out = in_A[0]; // Rotated bit off
                 LSR             : expected_c_out = in_A[0];
                 SHIFT_LEFT      : expected_c_out = in_A[ALU_WIDTH-1];
                 default         : expected_c_out = 0;
@@ -158,8 +150,7 @@ module tb_alu;
             dut_alu.in_B = transaction.in_B;
             dut_alu.c_in = transaction.c_in;
             dut_alu.op = transaction.op;
-
-            if (verbose) $display("T=%0t Sent transaction %s", $time, tx.to_string());
+            if (verbose) $display("T=%0t Sent transaction %s", $time, tx.inputs_to_string());
 
             // Capture outputs from DUT
             transaction.out = dut_alu.out;
@@ -169,21 +160,23 @@ module tb_alu;
             transaction.f_overflow = dut_alu.f_overflow;
             transaction.f_parity = dut_alu.f_parity;
 
+            // Check that all outputs match expected values
             if (transaction.out == expected_out && transaction.c_out == expected_c_out
                 && transaction.f_zero == expected_f_zero && transaction.f_negative == expected_f_negative
                 && transaction.f_overflow == expected_f_overflow && transaction.f_parity == expected_f_parity) begin
                 if (verbose) $display("T=%0t Passed %s", $time, tx.result_to_string());
                 num_correct += 1;
             end
-            else begin
+            else begin // Fail if they don't match
                 $display("T=%0t FAILED %s", $time, tx.result_to_string());
             end
 
-            num_total += 1;
+            num_total += 1; // Increment transaction counter
 
-            #(wait_time);
+            #(wait_time); // Wait for wait_time ns until next transaction
         }
 
+        // Print final result
         $display("T=%0t FINAL: %0d/%0d correct", $time, num_correct, num_total);
     end
 endmodule

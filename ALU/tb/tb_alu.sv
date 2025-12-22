@@ -6,7 +6,6 @@
 
 /*
 * Transactions specify one "round" of stimuli (inputs) to the DUT.
-* They are created by the generator, passed to the driver, then driven to the DUT.
 * Transactions also store DUT outputs for correctness checking.
 */
 class alu_transaction #(int WIDTH = 8);
@@ -54,7 +53,7 @@ module tb_alu;
     int wait_time = 5; // Wait time in ns between transactions
     int num_transactions = 20; // Total number of transactions
 
-    // DUT with parameterized widths
+    // DUT with parameterized width
     alu #(WIDTH = ALU_WIDTH) dut_alu (
         .in_A, .in_B, .c_in, .op,
 
@@ -144,7 +143,7 @@ module tb_alu;
             expected_f_zero = (expected_out == 0);
             expected_f_negative = (expected_out < 0);
             // A and B have same sign + A and out have different signs
-            expected_f_overflow = ((in_A * in_B) > 0) && ((in_A * expected_out) < 0);
+            expected_f_overflow = ((in_A<0) == (in_B<0)) && ((in_A<0) != (expected_out<0));
 
             // Drive inputs to DUT
             dut_alu.in_A = transaction.in_A;

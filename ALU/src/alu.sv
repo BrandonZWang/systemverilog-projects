@@ -55,7 +55,9 @@ module alu #(parameter WIDTH = 8) (
         // in_B_zeroext = {1'b0, in_B}; // Zero extend B
         in_A_signext = {in_A[WIDTH-1], in_A}; // Sign extend A
         in_B_signext = {in_B[WIDTH-1], in_B}; // Sign extend B
-        case (op) // set outputs based on bitwise operations
+        // set outputs based on bitwise operations
+        // MSB of result = carryout, rest of result = output
+        case (op)
             PASSTHROUGH     : result = in_A_zeroext;
             ADD             : result = in_A_signext + in_B_signext;
             ADD_WITH_CIN    : result = in_A_signext + in_B_signext + c_in;
@@ -68,6 +70,7 @@ module alu #(parameter WIDTH = 8) (
             BIT_OR          : result = {1'b0, in_A | in_B};
             BIT_XOR         : result = {1'b0, in_A ^ in_B};
             BIT_NOT         : result = {1'b0, ~in_A};
+            // For shifts, set the carryout = bit that was shifted off.
             ASR             : result = {in_A_signext[0], in_A_signext[WIDTH:1]}; // fill sign
             LSR             : result = {in_A_zeroext[0], in_A_zeroext[WIDTH:1]}; // fill zero
             SHIFT_LEFT      : result = {in_A, 1'b0}; // pad zero on end
@@ -138,6 +141,7 @@ module alu #(parameter WIDTH = 8) (
     always_comb begin : flag_logic
         f_zero = out == 0;
         f_negative = out[WIDTH-1] == 1;
+        // A and B have the same sign, A and out have different signs
         f_overflow = (in_A[WIDTH-1] == in_B[WIDTH-1]) 
             && (in_A[WIDTH-1] != out[WIDTH-1]);
         f_parity = ^out; // XOR reduction operator

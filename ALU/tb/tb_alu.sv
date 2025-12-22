@@ -9,7 +9,7 @@
 * They are created by the generator, passed to the driver, then driven to the DUT.
 * Transactions also store DUT outputs for correctness checking.
 */
-class alu_transaction #(parameter int WIDTH = 8);
+class alu_transaction #(int WIDTH = 8);
     rand logic[WIDTH-1:0] in_A,  // First input
     rand logic[WIDTH-1:0] in_B,  // Second input
     rand logic            c_in,  // Carry in
@@ -86,8 +86,9 @@ module tb_alu;
         $display("T=%0t Starting...", $time);
 
         // Generate transactions in loop
+        alu_transaction #(.WIDTH (ALU_WIDTH)) transaction;
         for (int i = 0; i < num_transactions; i++) {
-            alu_transaction transaction = new; // Create new transaction
+            transaction = new; // Create new transaction
             transaction.randomize(); // Randomize stimuli
             if (verbose) $display("T=%0t Created transaction %0d/%0d", $time, i+1, num_transactions);
 

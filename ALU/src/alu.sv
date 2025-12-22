@@ -1,7 +1,6 @@
 /*
-* Variable width two's complement ALU. Default 8 bits wide.
+* Opcode enum. See README for more detailed description.
 */
-
 typedef enum logic[3:0] {
     PASSTHROUGH     = 4'b0000, // Passthrough
     ADD             = 4'b0001, // Add
@@ -21,6 +20,9 @@ typedef enum logic[3:0] {
     ROTATE_LEFT     = 4'b1111  // Rotate A left by 1
 } opcode;
 
+/*
+* Variable width two's complement ALU. Default 8 bits wide.
+*/
 module alu #(parameter WIDTH = 8) (
     input logic[WIDTH-1:0]  in_A,       // First input
     input logic[WIDTH-1:0]  in_B,       // Second input

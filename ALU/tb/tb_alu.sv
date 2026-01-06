@@ -9,23 +9,23 @@
 * Transactions also store DUT outputs for correctness checking.
 */
 class alu_transaction #(int WIDTH = 8);
-    rand logic[WIDTH-1:0] in_A,  // First input
-    rand logic[WIDTH-1:0] in_B,  // Second input
-    rand logic            c_in,  // Carry in
-    rand opcode           op,    // Operation
+    rand logic[WIDTH-1:0] in_A;  // First input
+    rand logic[WIDTH-1:0] in_B;  // Second input
+    rand logic            c_in;  // Carry in
+    rand opcode           op;    // Operation
 
-    logic[WIDTH-1:0] out,        // Output
-    logic            c_out,      // Carry out
-    logic            f_zero,     // Zero flag
-    logic            f_negative, // Negative flag
-    logic            f_overflow, // Overflow flag
-    logic            f_parity    // Parity flag
+    logic[WIDTH-1:0] out;        // Output
+    logic            c_out;      // Carry out
+    logic            f_zero;     // Zero flag
+    logic            f_negative; // Negative flag
+    logic            f_overflow; // Overflow flag
+    logic            f_parity;    // Parity flag
 
     function new(); endfunction
 
     // inputs_to_string() formats the inputs to the DUT
     function string inputs_to_string();
-        return $sformatf("A=%0d B=%0d c_in=%1b opcode=%4b", in_A, in_B, c_in, opcode);
+        return $sformatf("A=%0d B=%0d c_in=%1b opcode=%4b", in_A, in_B, c_in, op);
     endfunction
 
     // result_to_string() formats the full transaction contents including inputs / outputs

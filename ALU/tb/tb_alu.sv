@@ -22,7 +22,7 @@ class alu_transaction #(int WIDTH = 8);
     logic            f_zero;     // Zero flag
     logic            f_negative; // Negative flag
     logic            f_overflow; // Overflow flag
-    logic            f_parity;    // Parity flag
+    logic            f_parity;   // Parity flag
 
     function new(); endfunction
 
@@ -72,7 +72,9 @@ module tb_alu;
         .f_overflow(f_overflow), .f_parity(f_parity)
     );
 
+    // Setup
     initial begin
+        // Set output file for waveform
         $dumpfile("tb_alu.vcd");
         $dumpvars(0, tb_alu);
 
@@ -91,10 +93,11 @@ module tb_alu;
 
     initial begin
         alu_transaction #(.WIDTH(`ALU_WIDTH)) transaction;
+        // All variables to calculate expected outputs
         int in_A_int, in_B_int, expected_out, result;
         bit expected_c_out, expected_f_zero, expected_f_negative;
         bit expected_f_overflow, expected_f_parity;
-        logic c_in_bit; // logic, not bit because bit 1 = signed -1 (only 1 wide)
+        logic c_in_bit; // Logic, not bit because bit behavior is weird
 
         // Initialize transaction tracker
         num_correct = 0;
@@ -113,13 +116,13 @@ module tb_alu;
             in_B_int = signed'(transaction.in_B);
             c_in_bit = logic'(transaction.c_in);
 
-            // set expected_out based on op
+            // Set expected_out based on op
             case (transaction.op)
                 PASSTHROUGH     : result = in_A_int;
                 ADD             : result = in_A_int + in_B_int;
                 ADD_WITH_CIN    : result = in_A_int + in_B_int + c_in_bit;
                 SUBTRACT        : result = in_A_int - in_B_int;
-                SUB_WITH_CIN    : result = in_A_int - in_B_int - 8'((c_in_bit) ? 0 : 1);
+                SUB_WITH_CIN    : result = in_A_int - in_B_int - (`ALU_WIDTH)'((c_in_bit) ? 0 : 1); // Weird but works!
                 TWOS_COMPLEMENT : result = -1 * in_A_int;
                 INCREMENT       : result = in_A_int + 1;
                 DECREMENT       : result = in_A_int - 1;
@@ -130,13 +133,14 @@ module tb_alu;
                 ASR             : result = in_A_int >>> 1;
                 LSR             : result = in_A_int >> 1;
                 SHIFT_LEFT      : result = in_A_int << 1;
-                ROTATE_LEFT     : result = (in_A_int << 1) + (in_A_int >> (`ALU_WIDTH-1));
+                // For rotate, don't worry about MSB because expected_out calculation
+                ROTATE_LEFT     : result = (in_A_int << 1) + (in_A_int >> (`ALU_WIDTH-1)); 
             endcase
             expected_out = (`ALU_WIDTH)'(result);
 
             // set expected c_out based on op
             case (transaction.op)
-                ADD             : expected_c_out = result >> `ALU_WIDTH;
+                ADD             : expected_c_out = result >> `ALU_WIDTH; // MSB
                 ADD_WITH_CIN    : expected_c_out = result >> `ALU_WIDTH;
                 SUBTRACT        : expected_c_out = result >> `ALU_WIDTH;
                 SUB_WITH_CIN    : expected_c_out = result >> `ALU_WIDTH;
@@ -146,14 +150,14 @@ module tb_alu;
                 ASR             : expected_c_out = in_A_int[0]; // Rotated bit off
                 LSR             : expected_c_out = in_A_int[0];
                 SHIFT_LEFT      : expected_c_out = in_A_int[`ALU_WIDTH-1];
-                default         : expected_c_out = 0;
+                default         : expected_c_out = 0; // 0 for all others
             endcase
 
             // Flag calculation
             expected_f_zero = (expected_out == 0);
             expected_f_negative = (expected_out < 0);
             // A and B have same sign + A and out have different signs
-            expected_f_overflow = ((in_A_int<0) == (in_B_int<0)) && ((in_A_int<0) != (expected_out<0));
+            expected_f_overflow = ((in_A_int<0)==(in_B_int<0)) && ((in_A_int<0)!=(expected_out<0));
             expected_f_parity = ^expected_out;
 
             // Drive inputs to DUT

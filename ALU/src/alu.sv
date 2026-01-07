@@ -43,12 +43,13 @@ module alu #(parameter WIDTH = 8) (
     logic[WIDTH:0] in_B_signext; // Sign extend B
     logic[WIDTH:0] result;
 
+    // Output and carry-out calculations
     always_comb begin : output_logic
         in_A_zeroext = {1'b0, in_A}; // Zero extend A
         // in_B_zeroext = {1'b0, in_B}; // Zero extend B
         in_A_signext = {in_A[WIDTH-1], in_A}; // Sign extend A
         in_B_signext = {in_B[WIDTH-1], in_B}; // Sign extend B
-        // set outputs based on bitwise operations
+        // Set outputs based on bitwise operations
         // MSB of result = carryout, rest of result = output
         case (op)
             PASSTHROUGH     : result = in_A_zeroext;
@@ -70,10 +71,12 @@ module alu #(parameter WIDTH = 8) (
             ROTATE_LEFT     : result = {1'b0, in_A[WIDTH-2:0], in_A[WIDTH-1]};
         endcase
 
+        // Separate out and c_out from result
         out = result[WIDTH-1:0];
         c_out = result[WIDTH];
     end
 
+    // Flag calculations
     always_comb begin : flag_logic
         f_zero = out == 0;
         f_negative = out[WIDTH-1] == 1;

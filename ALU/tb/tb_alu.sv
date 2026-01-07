@@ -42,7 +42,7 @@ class alu_transaction #(int WIDTH = 8);
     // result_to_string() formats the full transaction contents including inputs / outputs
     function string result_to_string();
         return $sformatf("A=%0d B=%0d c_in=%1b opcode=%4b out=%0d c_out=%1b f_zero=%1b f_negative=%1b f_overflow=%1b f_parity=%1b",
-            in_A, in_B, c_in, op, out, c_out, f_zero, f_negative, f_overflow, f_parity);
+            in_A, in_B, c_in, op, signed'(out), c_out, f_zero, f_negative, f_overflow, f_parity);
     endfunction
 endclass
 
@@ -173,7 +173,7 @@ module tb_alu;
             transaction.f_parity = f_parity;
 
             // Check that all outputs match expected values
-            if (transaction.out == expected_out && transaction.c_out == expected_c_out
+            if (signed'(transaction.out) == expected_out && transaction.c_out == expected_c_out
                 && transaction.f_zero == expected_f_zero && transaction.f_negative == expected_f_negative
                 && transaction.f_overflow == expected_f_overflow && transaction.f_parity == expected_f_parity) begin
                 if (verbose) $display("T=%0t Passed %s", $time, transaction.result_to_string());

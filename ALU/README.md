@@ -48,7 +48,7 @@ Resource usage when synthesized on a MAX1000: <br>
 ![164 / 15,840 LUTs](resource_usage.png)
 
 Example of simulation with command-line arguments showing no failures: <br>
-![100/100 correct](simulation_example.png)
+![Shows verbose logging, custom wait time and # transactions](simulation_example.png)
 
 Netlist view: <br>
 ![Incomprehensible](netlist.png)

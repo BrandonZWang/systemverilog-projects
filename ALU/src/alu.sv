@@ -37,15 +37,6 @@ module alu #(parameter WIDTH = 8) (
     output logic            f_parity    // Parity flag
 );
 
-    // // Wires for adder operations and bitwise operations
-    // logic[WIDTH:0] adder_out; // Note extra width for carry bit
-    // logic[WIDTH-1:0] adder_in_A, adder_in_B;
-    // logic adder_in_C;
-    // logic[WIDTH-1:0] bitop_out;
-    // logic bitop_c_out;
-    // // Determines whether ALU uses output from adder or bitwise ops
-    // logic use_adder_result;
-
     logic[WIDTH:0] in_A_zeroext; // Zero extend A
     // logic[WIDTH:0] in_B_zeroext; // Zero extend B
     logic[WIDTH:0] in_A_signext; // Sign extend A
@@ -81,63 +72,6 @@ module alu #(parameter WIDTH = 8) (
 
         out = result[WIDTH-1:0];
         c_out = result[WIDTH];
-
-        // use_adder_result = (op == ADD) || (op == ADD_WITH_CIN)
-        // || (op == SUBTRACT) || (op == SUB_WITH_CIN) || (op == TWOS_COMPLEMENT)
-        // || (op == INCREMENT) || (op == DECREMENT);
-        // // Default value for adder operations
-        // adder_out = adder_in_A + adder_in_B + adder_in_C;
-        // adder_in_A = in_A;
-        // adder_in_B = in_B;
-        // adder_in_C = c_in;
-        // case (op) // Set adder_out based on arithmetic operations
-        //     ADD             : adder_in_C = 0; // in_A + in_B
-        //     // ADD_WITH_CIN    : ; // in_A + in_B + c_in
-        //     SUBTRACT        : begin
-        //         adder_in_B = ~in_B; adder_in_C = 1; // in_A + ~in_B + 1
-        //     end
-        //     SUB_WITH_CIN    : begin
-        //         adder_in_B = ~in_B; // in_A + ~in_B + c_in
-        //     end
-        //     TWOS_COMPLEMENT : begin
-        //         adder_in_A = ~in_A; adder_in_B = 0; adder_in_C = 1; // ~in_A + 1
-        //     end
-        //     INCREMENT       : begin
-        //         adder_in_B = 0; adder_in_C = 1; // in_A + 1
-        //     end
-        //     DECREMENT       : begin
-        //         adder_in_B = -1; adder_in_C = 0; // in_A - 1
-        //     end
-        // endcase
-
-        // // Default values for bitwise operation output and carry out
-        // bitop_out = 0;
-        // bitop_c_out = 0;
-        // case (op) // set outputs based on bitwise operations
-        //     PASSTHROUGH : bitop_out = in_A;
-        //     BIT_AND     : bitop_out = in_A & in_B;
-        //     BIT_OR      : bitop_out = in_A | in_B;
-        //     BIT_XOR     : bitop_out = in_A ^ in_B;
-        //     BIT_NOT     : bitop_out = ~in_A;
-        //     // For shift operations, carry out = bit that was shifted off
-        //     ASR         : begin
-        //         bitop_out = in_A >>> 1;
-        //         bitop_c_out = in_A[0];
-        //     end
-        //     LSR         : begin
-        //         bitop_out = in_A >> 1;
-        //         bitop_c_out = in_A[0];
-        //     end
-        //     SHIFT_LEFT  : begin
-        //         bitop_out = in_A << 1;
-        //         bitop_c_out = in_A[WIDTH-1];
-        //     end
-        //     ROTATE_LEFT : bitop_out = {in_A[WIDTH-2 : 0], in_A[WIDTH-1]};
-        // endcase
-
-        // // Determine whether to use adder or bitwise outputs
-        // out = use_adder_result ? adder_out[WIDTH-1:0] : bitop_out;
-        // c_out = use_adder_result ? adder_out[WIDTH] : bitop_c_out;
     end
 
     always_comb begin : flag_logic

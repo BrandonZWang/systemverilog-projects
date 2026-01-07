@@ -44,7 +44,14 @@ Note: This ALU implementation does not use the carry-in bit as an extension to t
 
 ## Screenshots
 
+Resource usage when synthesized on a MAX1000:
+![164 / 15,840 LUTs](resource_usage.png)
 
+Example of simulation with command-line arguments showing no failures.
+![100/100 correct](simulation_example.png)
+
+Netlist view:
+![Incomprehensible](netlist.png)
 
 ## Resources
 

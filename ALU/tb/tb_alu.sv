@@ -58,8 +58,8 @@ module tb_alu;
     int num_correct; // Number of correct transactions so far
     int num_total; // Number of total transactions so far
     int verbose = 0; // Whether to print verbose logs
-    int wait_time = 5; // Wait time in ns between transactions
-    int num_transactions = 20; // Total number of transactions
+    int wait_time = 1; // Wait time in ns between transactions
+    int num_transactions = 200; // Total number of transactions
 
     // DUT with parameterized width
     logic[`ALU_WIDTH-1:0] in_A, in_B, out;
@@ -92,8 +92,9 @@ module tb_alu;
     initial begin
         alu_transaction #(.WIDTH(`ALU_WIDTH)) transaction;
         int in_A_int, in_B_int, expected_out, result;
-        bit c_in_bit, expected_c_out, expected_f_zero, expected_f_negative;
+        bit expected_c_out, expected_f_zero, expected_f_negative;
         bit expected_f_overflow, expected_f_parity;
+        logic c_in_bit;
 
         // Initialize transaction tracker
         num_correct = 0;
@@ -110,15 +111,15 @@ module tb_alu;
             // Cast transaction elements to appropriate types, just in case
             in_A_int = signed'(transaction.in_A);
             in_B_int = signed'(transaction.in_B);
-            c_in_bit = bit'(transaction.c_in);
+            c_in_bit = logic'(transaction.c_in);
 
             // set expected_out based on op
             case (transaction.op)
                 PASSTHROUGH     : result = in_A_int;
                 ADD             : result = in_A_int + in_B_int;
-                ADD_WITH_CIN    : result = in_A_int + in_B_int + signed'(c_in_bit);
+                ADD_WITH_CIN    : result = in_A_int + in_B_int + c_in_bit;
                 SUBTRACT        : result = in_A_int - in_B_int;
-                SUB_WITH_CIN    : result = in_A_int - in_B_int - signed'(~c_in_bit);
+                SUB_WITH_CIN    : result = in_A_int - in_B_int - ~c_in_bit;
                 TWOS_COMPLEMENT : result = -1 * in_A_int;
                 INCREMENT       : result = in_A_int + 1;
                 DECREMENT       : result = in_A_int - 1;

@@ -116,9 +116,9 @@ module tb_alu;
             case (transaction.op)
                 PASSTHROUGH     : result = in_A_int;
                 ADD             : result = in_A_int + in_B_int;
-                ADD_WITH_CIN    : result = in_A_int + in_B_int + c_in_bit;
+                ADD_WITH_CIN    : result = in_A_int + in_B_int + signed'(c_in_bit);
                 SUBTRACT        : result = in_A_int - in_B_int;
-                SUB_WITH_CIN    : result = in_A_int - in_B_int - ~c_in_bit;
+                SUB_WITH_CIN    : result = in_A_int - in_B_int - signed'(~c_in_bit);
                 TWOS_COMPLEMENT : result = -1 * in_A_int;
                 INCREMENT       : result = in_A_int + 1;
                 DECREMENT       : result = in_A_int - 1;

@@ -94,7 +94,7 @@ module tb_alu;
         int in_A_int, in_B_int, expected_out, result;
         bit expected_c_out, expected_f_zero, expected_f_negative;
         bit expected_f_overflow, expected_f_parity;
-        logic c_in_bit;
+        logic c_in_bit; // logic, not bit because bit 1 = signed -1 (only 1 wide)
 
         // Initialize transaction tracker
         num_correct = 0;
@@ -119,7 +119,7 @@ module tb_alu;
                 ADD             : result = in_A_int + in_B_int;
                 ADD_WITH_CIN    : result = in_A_int + in_B_int + c_in_bit;
                 SUBTRACT        : result = in_A_int - in_B_int;
-                SUB_WITH_CIN    : result = in_A_int - in_B_int - ~c_in_bit;
+                SUB_WITH_CIN    : result = in_A_int - in_B_int - 8'((c_in_bit) ? 0 : 1);
                 TWOS_COMPLEMENT : result = -1 * in_A_int;
                 INCREMENT       : result = in_A_int + 1;
                 DECREMENT       : result = in_A_int - 1;

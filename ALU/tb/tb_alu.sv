@@ -95,9 +95,8 @@ module tb_alu;
         alu_transaction #(.WIDTH(`ALU_WIDTH)) transaction;
         // All variables to calculate expected outputs
         int in_A_int, in_B_int, expected_out, result;
-        bit expected_c_out, expected_f_zero, expected_f_negative;
+        bit c_in_bit, expected_c_out, expected_f_zero, expected_f_negative;
         bit expected_f_overflow, expected_f_parity;
-        logic c_in_bit; // Logic, not bit because bit behavior is weird
 
         // Initialize transaction tracker
         num_correct = 0;
@@ -114,7 +113,7 @@ module tb_alu;
             // Cast transaction elements to appropriate types, just in case
             in_A_int = signed'(transaction.in_A);
             in_B_int = signed'(transaction.in_B);
-            c_in_bit = logic'(transaction.c_in);
+            c_in_bit = bit'(transaction.c_in);
 
             // Set expected_out based on op
             case (transaction.op)
@@ -122,7 +121,8 @@ module tb_alu;
                 ADD             : result = in_A_int + in_B_int;
                 ADD_WITH_CIN    : result = in_A_int + in_B_int + c_in_bit;
                 SUBTRACT        : result = in_A_int - in_B_int;
-                SUB_WITH_CIN    : result = in_A_int - in_B_int - (`ALU_WIDTH)'((c_in_bit) ? 0 : 1); // Weird but works!
+                // Must cast to ALU_WIDTH because otherwise it thinks it's a 1-wide negative number
+                SUB_WITH_CIN    : result = in_A_int - in_B_int - (`ALU_WIDTH)'((c_in_bit) ? 0 : 1);
                 TWOS_COMPLEMENT : result = -1 * in_A_int;
                 INCREMENT       : result = in_A_int + 1;
                 DECREMENT       : result = in_A_int - 1;

@@ -15,9 +15,11 @@ Note: This ALU implementation does not use the carry-in bit as an extension to t
 `tb_alu` uses a UVM-esque model to randomly and comprehensively test the `alu` module. Since `alu` is purely combinational, the only UVM-like element is the implementation of an `alu_transaction` class that stores inputs and outputs to interact with the DUT.
 
 `tb_alu` accepts several command-line arguments to customize simulation, which should be added when calling `vsim`. <br>
-`+verbose` enables verbose logging, which will print additional testbench information, which can be useful for debugging. By default, the testbench logs incorrect results and the final number of correct results. <br>
-`+wait_time=ns` specifies the number of nanoseconds to wait in between transactions. <br>
-`+num_transactions=n` specifies the number of transactions to execute on the DUT. Each transaction uses completely randomized inputs. <br>
+`+verbose` enables verbose logging, which will print additional testbench information, which can be useful for debugging. By default, the testbench logs incorrect results and the final number of correct results. Default: `false` <br>
+`+wait_time=ns` specifies the number of nanoseconds to wait in between transactions. Default: `5` <br>
+`+num_transactions=n` specifies the number of transactions to execute on the DUT. Each transaction uses completely randomized inputs. Default: `20` <br>
+
+`tb_alu` uses `$urandom` instead of randomize() to create random DUT stimuli. To change the random seed, use `-sv_seed random` when calling `vsim`.
 
 ## Table of Opcodes
 

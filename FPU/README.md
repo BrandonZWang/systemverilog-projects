@@ -72,6 +72,9 @@ Other non-relevant attributes:
 - Literal meaning (§10.4) - deals with source code translation, not individual operations.
 - Reproducibility (§11) - Not relevant as it concerns the translation of code into operations. `fpu` will be completely deterministic.
 
+### Operations (§5)
+All operations must compute an exact intermediate result, then round it. (§5.1) In practice, this could require an intermediate field that is twice the length of the significand, to ensure correct rounding. (?)
+
 ### Relevant Definitions (§2.1)
 - Binary floating-point number - underlying representation is binary (radix 2), not decimal (radix 10)
 - Format - A specification for the way binary numbers are represented, including radix, precision, and maximum exponent.

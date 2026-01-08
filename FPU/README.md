@@ -75,6 +75,16 @@ Other non-relevant attributes:
 ### Operations (§5)
 All operations must compute an exact intermediate result, then round it. (§5.1) In practice, this could require an intermediate field that is twice the length of the significand, to ensure correct rounding. (?)
 
+Operations that will probably need to be supported (rest could be handled by a CPU wrapper):
+- All rounding, next, and remainder operations (§5.3.1)
+- All logBFormat operations? (§5.3.3)
+- All arithmetic operations except for type conversions (§5.4.1)
+- All sign bit operations (§5.5.1)
+- All comparison operations (§5.6.1)
+- All general operations except for class and radix (§5.7.2)
+
+Could do arithmetic operations then raise flags + exceptions?
+
 ### Relevant Definitions (§2.1)
 - Binary floating-point number - underlying representation is binary (radix 2), not decimal (radix 10)
 - Format - A specification for the way binary numbers are represented, including radix, precision, and maximum exponent.

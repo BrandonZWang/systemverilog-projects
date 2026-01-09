@@ -11,6 +11,6 @@ module lzd_4 (
         num_zeros[1] = ~(number[3] | number[2]);
         num_zeros[0] = (~number[3] & number[2]) | (~number[3] & ~number[1]);
 
-        all_zeros = ~(|number);
+        all_zeros = ~(|number); // NOR of all bits in number
     end
 endmodule

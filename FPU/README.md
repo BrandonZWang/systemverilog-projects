@@ -101,4 +101,6 @@ Could do arithmetic operations then raise flags + exceptions?
 
 [Guard, round, and sticky bits](https://pages.cs.wisc.edu/~david/courses/cs552/S12/handouts/guardbits.pdf)
 
+[Leading zero detector](https://digitalsystemdesign.in/leading-zero-counter/)
+
 [IEEE 754-2019](https://www-users.cse.umn.edu/~vinals/tspot_files/phys4041/2020/IEEE%20Standard%20754-2019.pdf).

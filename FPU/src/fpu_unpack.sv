@@ -21,7 +21,7 @@ module fpu_unpack #(
     output logic is_subnormal
 );
 
-    localparam int packed_width = SIGN_WIDTH + EXPONENT_WIDTH + SIGNIFICAND_WIDTH; // total bitwidth of fp number
+    localparam int packed_width = 1 + EXPONENT_WIDTH + SIGNIFICAND_WIDTH; // total bitwidth of fp number
     localparam int significand_start = SIGNIFICAND_WIDTH - 1; // pos of first significand bit
     localparam int significand_end = 0; // pos of last significand bit
     localparam int exponent_start = significand_start + EXPONENT_WIDTH; // pos of first exponent bit

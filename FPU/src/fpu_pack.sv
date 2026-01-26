@@ -11,7 +11,7 @@ module fpu_pack #(
     input logic[SIGNIFICAND_WIDTH:0] significand // with implied bit
 
     // Packed output
-    output logic[packed_width:0] packed_fp,
+    output logic[packed_width-1:0] packed_fp,
 );
 
     localparam int packed_width = 1 + EXPONENT_WIDTH + SIGNIFICAND_WIDTH; // total bitwidth of fp number

@@ -7,7 +7,7 @@ module fpu_unpack #(
     SIGNIFICAND_WIDTH = 52
 ) (
     // Packed input
-    input logic[packed_width:0] packed_fp,
+    input logic[packed_width-1:0] packed_fp,
 
     // Unpacked output
     output logic sign,
